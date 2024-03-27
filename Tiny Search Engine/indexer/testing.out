@@ -1,0 +1,66 @@
+#!bin/bash
+
+echo "testing with invalid arugments"
+testing with invalid arugments
+echo "testing with less than 3 arguments"
+testing with less than 3 arguments
+./indexer
+usage: ./indexer pageDirectory indexFilename
+./indexer djsjsk
+usage: ./indexer pageDirectory indexFilename
+./indexer sjsjsj ssskk sskskks
+usage: ./indexer pageDirectory indexFilename
+echo "testing with invalid directory"
+testing with invalid directory
+./indexer djdjdj old_file
+invalid pageDirectory!
+echo "testing with valid directory but not crawler"
+testing with valid directory but not crawler
+rm -rf invaliddirectory
+mkdir invaliddirectory
+./indexer ./invaliddirectory
+usage: ./indexer pageDirectory indexFilename
+echo "testing with a file you can't write on"
+testing with a file you can't write on
+rm -rf data
+mkdir data
+cd ../crawler
+./crawler http://cs50tse.cs.dartmouth.edu/tse/wikipedia/index.html ./data 0
+Created bag of toCrawl pages
+Created hashtable for explored pages
+Crawling...
+cd ../indexer
+touch invalidfile
+chmod -w invalidfile
+./indexer ./data invalidfile
+invalid pageDirectory!
+echo "indexing an output from crawler"
+indexing an output from crawler
+touch test1
+./indexer /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-1 test1
+rm test1
+echo "indexing an output from crawler with more depth"
+indexing an output from crawler with more depth
+touch test1
+./indexer /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 test1
+rm test1
+touch test1
+echo "indexing wiki output from crawler"
+indexing wiki output from crawler
+./indexer /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/wikipedia-depth-0 test1
+
+echo "Testing indextest"
+Testing indextest
+echo "testing invalid cases of indextest: number of arguments"
+testing invalid cases of indextest: number of arguments
+./indextest waha
+Usage: ./indextest oldIndexFilename newIndexFilename
+./indextest wa sfs sadsad sad
+Usage: ./indextest oldIndexFilename newIndexFilename
+
+echo "Testing indextest"
+Testing indextest
+touch test2
+./indextest test1 test2
+
+exit 0;

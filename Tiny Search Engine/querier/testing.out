@@ -1,0 +1,47 @@
+#!/bin/bash
+#testing.sh
+
+#Invalid syntax in argument
+./querier
+usage: ./querier pageDirectory indexFilename
+./querier djsjsk
+usage: ./querier pageDirectory indexFilename
+./querier sjsjsj ssskk sskskks
+usage: ./querier pageDirectory indexFilename
+
+#testing with valid directory but not crawler
+rm -rf invaliddirectory
+mkdir invaliddirectory
+./querier invaliddirectory /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+invalid pageDirectory!
+rm -rf invaliddirectory
+
+#Testing with invalid characters
+echo "I love apples!" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+Query? 
+Error: bad character ! in query.
+
+#Testing with invalid conjunction placements
+echo "and for playground" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+Error: 'and' cannot be first
+Query? 
+echo "playground and and" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+Error: 'and' cannot be last
+Query? 
+echo "biology playground or" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+Error: 'or' cannot be last
+Query? 
+
+#Testing with words not in the index
+echo "platypus photosynthesis poop" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+Query? 
+Query: platypus photosynthesis poop 
+No documents match.
+
+#Testing with correct words
+echo "playground and biology" | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+free(): double free detected in tcache 2
+testing.sh: line 27: 38367 Done                    echo "playground and biology"
+     38368 Aborted                 (core dumped) | ./querier /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-depth-4 /thayerfs/courses/22spring/cosc050/cs50tse/tse-output/letters-index-4
+
+exit 0
