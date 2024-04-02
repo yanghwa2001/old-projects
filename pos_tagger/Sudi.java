@@ -337,15 +337,15 @@ public class Sudi{
 
     public static void main(String[] args) throws IOException {
         //Simple-test test runs
-        Sudi simpleTest = new Sudi("ps5/simple-train-sentences.txt", "ps5/simple-train-tags.txt");
-        String sudiFile = simpleTest.createFile("ps5/simple-test-sentences.txt");
-        simpleTest.accuracyTest("ps5/simple-test-tags.txt", sudiFile);
+        Sudi simpleTest = new Sudi("pos_tagger/simple-train-sentences.txt", "pos_tagger/simple-train-tags.txt");
+        String sudiFile = simpleTest.createFile("pos_tagger/simple-test-sentences.txt");
+        simpleTest.accuracyTest("pos_tagger/simple-test-tags.txt", sudiFile);
         System.out.println();
 
         //Brown test runs
-        Sudi brownTest = new Sudi("ps5/brown-train-sentences.txt", "ps5/brown-train-tags.txt");
-        String brownFile = brownTest.createFile("ps5/brown-test-sentences.txt");
-        brownTest.accuracyTest("ps5/brown-test-tags.txt", brownFile);
+        Sudi brownTest = new Sudi("pos_tagger/brown-train-sentences.txt", "pos_tagger/brown-train-tags.txt");
+        String brownFile = brownTest.createFile("pos_tagger/brown-test-sentences.txt");
+        brownTest.accuracyTest("pos_tagger/brown-test-tags.txt", brownFile);
         System.out.println();
 
         //console run
