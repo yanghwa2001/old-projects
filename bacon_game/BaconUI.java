@@ -40,9 +40,9 @@ public class BaconUI {
     public Graph<String, Set<String>> createInitialGraph() {
         Graph<String, Set<String>> returnedGraph = new AdjacencyMapGraph<>();
         try {
-            BufferedReader Actors = new BufferedReader(new FileReader("ps4/actors.txt"));
-            BufferedReader Movies = new BufferedReader(new FileReader("ps4/movies.txt"));
-            BufferedReader ActorIDtoMovieID = new BufferedReader(new FileReader("ps4/movie-actors.txt"));
+            BufferedReader Actors = new BufferedReader(new FileReader("bacon_game/actors.txt"));
+            BufferedReader Movies = new BufferedReader(new FileReader("bacone_game/movies.txt"));
+            BufferedReader ActorIDtoMovieID = new BufferedReader(new FileReader("bacon_game/movie-actors.txt"));
 
             try {
                 String actorLine;
