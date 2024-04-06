@@ -58,14 +58,14 @@ public class BaconGameGraphLib {
         return verticesSet;
     }
 
+
     public static <V,E> double averageSeparation(Graph<V,E> tree, V root){
         Graph<V,E> subtree = bfs(tree, root);
         double numChildren = subtree.numVertices() - 1;
         double totalSizePaths = 0;
 
-        for(V neighbors : subtree.inNeighbors(root)){
-            totalSizePaths += averageSeparationHelper(subtree, neighbors, 1);
-        }
+        totalSizePaths = averageSeparationHelper(subtree, root, 0);
+
         return (totalSizePaths / numChildren);
     }
 

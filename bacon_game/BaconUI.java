@@ -36,10 +36,18 @@ public class BaconUI {
             return false; // return false––invalid command
         }
     }
-
+    
+    /**
+     * createInitialGraph
+     * Reads three separate files (Actors to actor ids), (Movies to movie ids), (actor ids to movie ids) and creates maps for each.
+     * Returns a graph that uses Actor name as vertex and set of movies that the actor costarred as the edges
+     * 
+     */
     public Graph<String, Set<String>> createInitialGraph() {
+        //Initialize the resulting graph
         Graph<String, Set<String>> returnedGraph = new AdjacencyMapGraph<>();
         try {
+            //try reading the three source files
             BufferedReader Actors = new BufferedReader(new FileReader("bacon_game/actors.txt"));
             BufferedReader Movies = new BufferedReader(new FileReader("bacone_game/movies.txt"));
             BufferedReader ActorIDtoMovieID = new BufferedReader(new FileReader("bacon_game/movie-actors.txt"));
@@ -82,16 +90,14 @@ public class BaconUI {
                 for (String movieID : movieActorIDMap.keySet()) { // loop through all Movies in Movie ID and Actor ID Map
                     if (movieActorIDMap.get(movieID).size() > 1) { // if more than one actor starred in a movie
                         for (String actorID : movieActorIDMap.get(movieID)) { //loop through each actor for a movie twice in the map
-                            for (String ActorID2 : movieActorIDMap.get(movieID)) {
-                                if (!returnedGraph.hasEdge(actorMap.get(actorID),
-                                        actorMap.get(ActorID2))) { // if actors have not costarred yet (direct neighbors)
+                            for (String actorID2 : movieActorIDMap.get(movieID)) {
+                                if (!returnedGraph.hasEdge(actorMap.get(actorID), actorMap.get(actorID2))) { // if actors have not costarred yet (direct neighbors)
                                     Set<String> edgeSet = new HashSet<>(); //add the actor ID to the set
                                     edgeSet.add(moviesMap.get(movieID));
 
-                                    returnedGraph.insertDirected(actorMap.get(actorID), actorMap.get(ActorID2), edgeSet);
+                                    returnedGraph.insertDirected(actorMap.get(actorID), actorMap.get(actorID2), edgeSet);
                                 } else { // condition for costarred actors
-                                    returnedGraph.getLabel(actorMap.get(actorID),
-                                            actorMap.get(ActorID2)).add(moviesMap.get(movieID)); // add movie name to set of costarred movies
+                                    returnedGraph.getLabel(actorMap.get(actorID), actorMap.get(actorID2)).add(moviesMap.get(movieID)); // add movie name to set of costarred movies
                                 }
                             }
                         }
