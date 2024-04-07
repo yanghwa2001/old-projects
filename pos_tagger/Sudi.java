@@ -24,7 +24,10 @@ public class Sudi{
     }
 
     /**
-     *
+     * 
+     * Reads two files consisting of sentences and its corresponding pos tags to count frequencies of each words
+     * observed as specific pos tags. Creates a hashmap with the pos tag as the key and another hashmap with <word, frequency> as its value.
+     * 
      * @param sentenceFile
      * @param tagsFile
      * @throws IOException
@@ -111,7 +114,7 @@ public class Sudi{
             String tagLine = input.readLine();
             while (tagLine != null) {
                 String[] allLines = tagLine.split(" ");
-                for (int i = 0; i < allLines.length - 1; i++) {
+                for (int i = 0; i < allLines.length; i++) {
                     if (i == 0){
                         //start with #
                         if (transitions.containsKey("#")) {
@@ -337,15 +340,15 @@ public class Sudi{
 
     public static void main(String[] args) throws IOException {
         //Simple-test test runs
-        Sudi simpleTest = new Sudi("pos_tagger/simple-train-sentences.txt", "pos_tagger/simple-train-tags.txt");
-        String sudiFile = simpleTest.createFile("pos_tagger/simple-test-sentences.txt");
-        simpleTest.accuracyTest("pos_tagger/simple-test-tags.txt", sudiFile);
+        Sudi simpleTest = new Sudi("simple-train-sentences.txt", "simple-train-tags.txt");
+        String sudiFile = simpleTest.createFile("simple-test-sentences.txt");
+        simpleTest.accuracyTest("simple-test-tags.txt", sudiFile);
         System.out.println();
 
         //Brown test runs
-        Sudi brownTest = new Sudi("pos_tagger/brown-train-sentences.txt", "pos_tagger/brown-train-tags.txt");
-        String brownFile = brownTest.createFile("pos_tagger/brown-test-sentences.txt");
-        brownTest.accuracyTest("pos_tagger/brown-test-tags.txt", brownFile);
+        Sudi brownTest = new Sudi("brown-train-sentences.txt", "brown-train-tags.txt");
+        String brownFile = brownTest.createFile("brown-test-sentences.txt");
+        brownTest.accuracyTest("brown-test-tags.txt", brownFile);
         System.out.println();
 
         //console run
