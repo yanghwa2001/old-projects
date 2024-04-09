@@ -45,13 +45,13 @@ public class EditorCommunicator extends Thread {
 	public void run() {
 		try {
 			// Handle messages
-			// TODO: YOUR CODE HERE
 			String input = in.readLine();
-			String line;
+			String line;				
 			syncDraw(input);
-			while (((line = in.readLine()) != null)) {
+			while ((line = in.readLine()) != null) {
 				System.out.println("received " + line);
 				lineToList(line);
+				editor.repaint();
 			}
 		}
 		catch (IOException e) {
@@ -63,27 +63,26 @@ public class EditorCommunicator extends Thread {
 	}	
 
 	// Send editor requests to the server
-	// TODO: YOUR CODE HERE
 	public void lineToList(String s) {
 		if (!s.equals("")) {
 			String[] split = s.split(",");
-			if (split[0] == "add") {
+			if (split[0].equals("add")) {
 				handleAddingShape(split);
 			}
-			if (split[0] == "delete") {
+			if (split[0].equals("delete")) {
 				handleDeletingShape(split);
 			}
-			if (split[0] == "recolour") {
+			if (split[0].equals("recolor")) {
 				handleRecoloringShape(split);
 			}
-			if (split[0] == "move") {
+			if (split[0].equals("move")) {
 				handleMovingShape(split);
 			}
 		}
 		editor.repaint();
 	}
 
-	public void handleAddingShape(String[] stringList) {
+	synchronized public void handleAddingShape(String[] stringList) {
 		int id = Integer.parseInt(stringList[1]);
 		String shapeType = stringList[2];
 		Shape shape = null;
@@ -98,13 +97,13 @@ public class EditorCommunicator extends Thread {
 		}
 	}
 
-	public void handleDeletingShape(String[] stringList) {
+	synchronized public void handleDeletingShape(String[] stringList) {
 		int id = Integer.parseInt(stringList[1]);
 		editor.getSketch().getShapeMap().remove(id);
 		editor.repaint();
 	}
 
-	public void handleRecoloringShape(String[] stringList) {
+	synchronized public void handleRecoloringShape(String[] stringList) {
 		int id = Integer.parseInt(stringList[1]);
 		int rgb = Integer.parseInt(stringList[2]);
 		Shape s = editor.getSketch().getShapeMap().get(id);
@@ -114,12 +113,11 @@ public class EditorCommunicator extends Thread {
 		}
 	}
 
-	public void handleMovingShape(String[] stringList) {
+	synchronized public void handleMovingShape(String[] stringList) {
 		int id = Integer.parseInt(stringList[1]);
 		int dx = Integer.parseInt(stringList[2]);
 		int dy = Integer.parseInt(stringList[3]);
 		editor.getSketch().getShapeMap().get(id).moveBy(dx, dy);
-		editor.repaint();
 	}
 
 	/**
@@ -153,15 +151,15 @@ public class EditorCommunicator extends Thread {
 		int x2 = Integer.parseInt(strings[4 + i]);
 		int y2 = Integer.parseInt(strings[5 + i]);
 		int rgb = Integer.parseInt(strings[6 + i]);
-		if (s == "ellipse") { //creates ellipse, rectangle, or segment depending on the given string
+		if (s.equals("ellipse")) { //creates ellipse, rectangle, or segment depending on the given string
 			Color c = new Color(rgb);
 			shape = new Ellipse(x1, y1, x2, y2, c);
 		}
-		if (s == "rectangle") {
+		if (s.equals("rectangle")) {
 			Color c = new Color(rgb);
 			shape = new Rectangle(x1, y1, x2, y2, c);
 		}
-		if (s == "segment") {
+		if (s.equals("segment")) {
 			Color c = new Color(rgb);
 			shape = new Segment(x1, y1, x2, y2, c);
 		}
@@ -173,6 +171,7 @@ public class EditorCommunicator extends Thread {
 	 */
 	private void syncDraw(String s) {
 		if (!s.equals("")) {
+			System.out.println("syncing");
 			String[] split = s.split(" ");
 			for (String str : split) {
 				String[] strings = str.split(",");

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.*;
 
 /**
  * Handles communication between the server and one client, for SketchServer
@@ -38,13 +39,12 @@ public class SketchServerCommunicator extends Thread {
 			out = new PrintWriter(sock.getOutputStream(), true);
 
 			// Tell the client the current state of the world
-			// TODO: YOUR CODE HERE
 			send(server.getSketch().toString());
 
 			// Keep getting and handling messages from the client
-			// TODO: YOUR CODE HERE
 			String line;
-			while (((line = in.readLine()) != null)) {
+			while ((line = in.readLine()) != null) {
+				System.out.println("Received request to " + line);
 				readLineHelper(line);
 			}
 
@@ -61,22 +61,22 @@ public class SketchServerCommunicator extends Thread {
 
 	public void readLineHelper(String str) {
 		String[] split = str.split(","); // finds what the command is
-		if (split[0] == "add") {
+		if (split[0].equals("add")) {
 			handleAddingShape(split);
 		}
-		if (split[0] == "delete") {
+		if (split[0].equals("delete")) {
 			handleDeletingShape(split);
 		}
-		if (split[0] == "recolour") {
+		if (split[0].equals("recolor")) {
 			handleRecoloringShape(split);
 		}
-		if (split[0] == "move") {
+		if (split[0].equals("move")) {
 			handleMovingShape(split);
 		}
 	}
 
-	public void handleAddingShape(String[] strings) {
-		System.out.println("ADD mode!");
+	synchronized public void handleAddingShape(String[] strings) {
+		System.out.println("DRAW mode!");
 		Shape shape = null;
 		String s = strings[1];
 		if (s.equals("ellipse") || s.equals("rectangle") || s.equals("segment")) {
@@ -85,15 +85,15 @@ public class SketchServerCommunicator extends Thread {
 			int x2 = Integer.parseInt(strings[4]);
 			int y2 = Integer.parseInt(strings[5]);
 			int rgb = Integer.parseInt(strings[6]);
-			if (s == "ellipse") {
+			if (s.equals("ellipse")) {
 				Color c = new Color(rgb);
 				shape = new Ellipse(x1, y1, x2, y2, c);
 			}
-			if (s == "rectangle") {
+			if (s.equals("rectangle")) {
 				Color c = new Color(rgb);
 				shape = new Rectangle(x1, y1, x2, y2, c);
 			}
-			if (s == "segment") {
+			if (s.equals("segment")) {
 				Color c = new Color(rgb);
 				shape = new Segment(x1, y1, x2, y2, c);
 			}
@@ -101,47 +101,50 @@ public class SketchServerCommunicator extends Thread {
 			int n = (strings.length - 3) / 2;
 			int[] xPoints = new int[n];
 			int[] yPoints = new int[n];
-			int j = 2;
+			int j = 3;
 			while (j < strings.length - 1) {
 				int x = Integer.parseInt(strings[j]);
-				xPoints[(j - 2) / 2] = x;
+				xPoints[(j - 3) / 2] = x;
 				int y = Integer.parseInt(strings[j + 1]);
-				yPoints[(j - 2) / 2] = y;
+				yPoints[(j - 3) / 2] = y;
 				j += 2;
 			}
 			int rgb = Integer.parseInt((strings[(strings.length) - 1]));
 			Color c = new Color(rgb);
 			shape = new Polyline(xPoints, yPoints, c);
 		}
-		server.getSketch().setShapeID(SketchServer.id, shape);
-		server.broadcast("adding " + SketchServer.id + ", " +
-				server.getSketch().getShapeMap().get(SketchServer.id).toString());
-		SketchServer.id++;
+
+		if (shape != null) {
+			server.getSketch().setShapeID(SketchServer.id, shape);
+			server.broadcast("add," + SketchServer.id + "," + server.getSketch().getShapeMap().get(SketchServer.id).toString());
+			SketchServer.id++;
+		}
+		
 	}
 
-	public void handleDeletingShape(String[] strings) {
+	synchronized public void handleDeletingShape(String[] strings) {
 		System.out.println("delete mode");
 		int id = Integer.parseInt(strings[1]);
 		Shape shape = server.getSketch().getShapeMap().get(id);
 		if (shape != null) {
 			server.getSketch().getShapeMap().remove(id);
-			server.broadcast("delete " + id);
+			server.broadcast("delete," + id);
 		}
 	}
 
 	public void handleRecoloringShape(String[] strings) {
-		System.out.println("recolouring");
+		System.out.println("recoloring");
 		int id = Integer.parseInt(strings[1]);
 		int rgb = Integer.parseInt(strings[2]);
 		Shape shape = server.getSketch().getShapeMap().get(id);
 		if (shape != null) {
 			shape.setColor(new Color(rgb));
 			server.getSketch().setShapeID(id, shape);
-			server.broadcast("recolour, " + id + "," + shape.getColor().getRGB());
+			server.broadcast("recolor," + id + "," + shape.getColor().getRGB());
 		}
 	}
 
-	public void handleMovingShape(String[] strings) {
+	synchronized public void handleMovingShape(String[] strings) {
 		System.out.println("move mode");
 		int id = Integer.parseInt(strings[1]);
 		int dx = Integer.parseInt(strings[2]);

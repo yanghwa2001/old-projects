@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -78,8 +77,8 @@ public class Sketch {
     public String toString(){ //toString method for all the shapes in shapeMap
         String s = "";
         for(Integer id : shapeMap.descendingKeySet()){
-            s += id + "," + shapeMap.get(id).toString() + " ";
-        }
+            s += id + "," + getShape(id).toString() + " ";
+        } 
         return s;
     }
 

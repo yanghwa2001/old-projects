@@ -11,7 +11,6 @@ import java.util.List;
  * @author CBK, updated Fall 2016
  */
 public class Polyline implements Shape {
-	// TODO: YOUR CODE HERE
 	private int[] pointsX, pointsY; //contains the x and y points
 	private int points;
 	private Color color;
@@ -61,7 +60,7 @@ public class Polyline implements Shape {
 	
 	@Override
 	public boolean contains(int x, int y) {
-		for (int i = 0; i < this.points; i++) {
+		for (int i = 0; i < this.points-1; i++) {
 			if (Segment.pointToSegmentDistance(x, y, pointsX[i], pointsY[i], pointsX[i+1], pointsY[i+1]) <= 3) {
 				return true;
 			}
@@ -77,9 +76,9 @@ public class Polyline implements Shape {
 
 	@Override
 	public String toString() {
-		String string = "polyline ";
+		String string = "polyline,";
 		for (int i=0; i < points; i++) {
-			string += pointsX[i] + " " + pointsY[i] + " ";
+			string += pointsX[i] + "," + pointsY[i] + ",";
 		}
 		string += color.getRGB();
 

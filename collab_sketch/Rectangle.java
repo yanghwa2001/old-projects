@@ -10,7 +10,6 @@ import java.awt.Graphics;
  * @author CBK, updated Fall 2016
  */
 public class Rectangle implements Shape {
-	// TODO: YOUR CODE HERE
 	private int x1, x2, y1, y2; //points of a rectangle
 	private Color color; //its color
 
@@ -61,6 +60,6 @@ public class Rectangle implements Shape {
 	}
 
 	public String toString() {
-		return "rectangle "+x1+" "+y1+" "+x2+" "+y2+" " +  color.getRGB();
+		return "rectangle,"+x1+","+y1+","+x2+","+y2+"," + color.getRGB();
 	}
 }

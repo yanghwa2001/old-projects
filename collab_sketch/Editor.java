@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -168,7 +166,6 @@ public class Editor extends JFrame {
 	 * along with the object currently being drawn in this editor (not yet part of the sketch)
 	 */
 	public void drawSketch(Graphics g) {
-		// TODO: YOUR CODE HERE
 		for (int id : sketch.getShapeMap().keySet()) {
 			sketch.getShape(id).draw(g);
 		}
@@ -188,37 +185,48 @@ public class Editor extends JFrame {
 	 * in deleting mode, (request to) delete clicked shape
 	 */
 	private void handlePress(Point p) {
-		// TODO: YOUR CODE HERE
 		if (mode == Mode.DRAW) { //draw mode
 			this.drawFrom = p;
 
-			if (shapeType == "freehand") { //if the shape mode is polyline
+			if (shapeType.equals("freehand")) { //if the shape mode is polyline
 				int[] x = new int[0]; //starting point
 				int[] y = new int[0];
 				curr = new Polyline(x, y, color); //create new polyline object
-				((Polyline) curr).addPoints(p.x, p.y); //add new points to the polyline
+				((Polyline) curr).addPoints(drawFrom.x, drawFrom.y); //add new points to the polyline
 			}
+			else if (shapeType.equals("ellipse")) {
+				curr = new Ellipse(drawFrom.x, drawFrom.y, color);
+			}
+			else if (shapeType.equals("rectangle")){
+				curr = new Rectangle(drawFrom.x, drawFrom.y, color);
+			}
+			else if (shapeType.equals("segment")){
+				curr = new Segment(drawFrom.x, drawFrom.y, color);
+			}
+
 		}
 
-		if (mode == Mode.MOVE) { //move mode
+		else if (mode == Mode.MOVE) { //move mode
 			int id = sketch.getShapeId(p); //identify what shape it is that is clicked on
 			curr = sketch.getShape(id);
 			if (curr != null && curr.contains(p.x, p.y)) {
 				moveFrom = p; //ready for move
-				movingId = id;
+				this.movingId = id;
 			}
 		}
-		if (mode == Mode.RECOLOR) { //recolor mode
+		else if (mode == Mode.RECOLOR) { //recolor mode
 			int id = sketch.getShapeId(p); //identify shape id
 			curr = sketch.getShape(id);
 			if (curr != null && curr.contains(p.x, p.y)) { //if shape exists and is clicked on, recolor
 				curr.setColor(color);
+				comm.send("recolor,"+id+","+color.getRGB());
 			}
 		}
-		if (mode == Mode.DELETE) { //delete mode
+		else if (mode == Mode.DELETE) { //delete mode
 			int id = sketch.getShapeId(p);
 			curr = sketch.getShape(id);
 			sketch.removeShape(curr); //delete
+			comm.send("delete,"+id);
 		}
 		repaint();
 	}
@@ -229,31 +237,33 @@ public class Editor extends JFrame {
 	 * in moving mode, (request to) drag the object
 	 */
 	private void handleDrag(Point p) {
-		// TODO: YOUR CODE HERE
 		if(mode==Mode.DRAW){ //draw shapes depending on the shape type
-			if (shapeType == "ellipse") {
+			if (shapeType.equals("ellipse")) {
 				curr = new Ellipse(drawFrom.x, drawFrom.y, p.x, p.y, color);
 			}
-			else if (shapeType == "rectangle") {
+			else if (shapeType.equals("rectangle")) {
 				curr = new Rectangle(drawFrom.x, drawFrom.y, p.x, p.y, color);
 			}
-			else if (shapeType == "freehand") {
+			else if (shapeType.equals("freehand")) {
 				((Polyline) curr).addPoints(p.x, p.y);
 			}
-			else if (shapeType == "segment") {
+			else if (shapeType.equals("segment")) {
 				curr = new Segment(drawFrom.x, drawFrom.y, p.x, p.y, color);
 			}
+			repaint();
 		}
 
 		if(mode==Mode.MOVE){ //move mode
-			if(moveFrom != null){
+			if (curr != null && moveFrom != null && curr.contains(p.x, p.y)){
 				int dx = p.x - moveFrom.x;
 				int dy = p.y - moveFrom.y;
-				curr.moveBy(dx, dy);
+				int id = sketch.getShapeId(p);
+				comm.send("move,"+id+","+dx+","+dy);
+				// curr.moveBy(dx, dy);
 				moveFrom = p;
+				repaint();
 			}
 		}
-		repaint();
 	}
 
 	/**
@@ -262,10 +272,10 @@ public class Editor extends JFrame {
 	 * in moving mode, release it		
 	 */
 	private void handleRelease() {
-		// TODO: YOUR CODE HERE
 		if (mode == Mode.DRAW){ //if mode is draw, finish drawing the shape
-			if (curr!= null) {
+			if (curr != null) {
 				sketch.addShape(curr);
+				comm.send("add,"+curr.toString());
 				drawFrom = null;
 				curr = null;
 			}
