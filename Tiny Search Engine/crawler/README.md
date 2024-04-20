@@ -1,7 +1,6 @@
-# CS50 Lab 4
-## CS50 Spring 2022
+# Crawler
 
-## Crawler
+## Program Description
 As described in the requirement spec, the TSE crawler is a standalone program that crawls the web and retrieves webpages starting from a "seed" URL. It parses the seed webpage, extracts any embedded URLs, then retrieves each of those pages, recursively, but limiting its exploration to a given "depth".
 
 ### Compilation

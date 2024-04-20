@@ -1,5 +1,5 @@
 /**
- * PS4: Bacon Game
+ * Bacon Game
  * Author: Ryan Lee, CS10, Winter 2022
  */
 
@@ -48,9 +48,9 @@ public class BaconUI {
         Graph<String, Set<String>> returnedGraph = new AdjacencyMapGraph<>();
         try {
             //try reading the three source files
-            BufferedReader Actors = new BufferedReader(new FileReader("bacon_game/actors.txt"));
-            BufferedReader Movies = new BufferedReader(new FileReader("bacone_game/movies.txt"));
-            BufferedReader ActorIDtoMovieID = new BufferedReader(new FileReader("bacon_game/movie-actors.txt"));
+            BufferedReader Actors = new BufferedReader(new FileReader("actors.txt"));
+            BufferedReader Movies = new BufferedReader(new FileReader("movies.txt"));
+            BufferedReader ActorIDtoMovieID = new BufferedReader(new FileReader("movie-actors.txt"));
 
             try {
                 String actorLine;
@@ -76,7 +76,7 @@ public class BaconUI {
                 while ((IDsLine = ActorIDtoMovieID.readLine()) != null) {
                     String[] allWords = IDsLine.split("\\|");
                     String MovieID = allWords[0]; // get movie ID
-                    String ActorID = allWords[1]; // ©et actor ID
+                    String ActorID = allWords[1]; // get actor ID
                     if (movieActorIDMap.containsKey(MovieID)) { // if Movie already
                         movieActorIDMap.get(MovieID).add(ActorID); // add actor ID
                     } else { //create set of actor IDs for each movie ID
@@ -89,7 +89,7 @@ public class BaconUI {
 
                 for (String movieID : movieActorIDMap.keySet()) { // loop through all Movies in Movie ID and Actor ID Map
                     if (movieActorIDMap.get(movieID).size() > 1) { // if more than one actor starred in a movie
-                        for (String actorID : movieActorIDMap.get(movieID)) { //loop through each actor for a movie twice in the map
+                        for (String actorID : movieActorIDMap.get(movieID)) { //loop through each actor for a movie twice in the set
                             for (String actorID2 : movieActorIDMap.get(movieID)) {
                                 if (!returnedGraph.hasEdge(actorMap.get(actorID), actorMap.get(actorID2))) { // if actors have not costarred yet (direct neighbors)
                                     Set<String> edgeSet = new HashSet<>(); //add the actor ID to the set
@@ -122,7 +122,8 @@ public class BaconUI {
 
 
     public static void main(String[] args) {
-        System.out.print("Welcome to the Bacon Game!\nCommands:\nn: select new center of the universe (default: Kevin Bacon) \n\t (enter name)\n" +
+        System.out.print("Welcome to the Bacon Game!\nCommands:\n
+                n: select new center of the universe (default: Kevin Bacon) \n\t (enter name)\n" +
                 "s: choose new actor to find shortest path to center of universe \n\t (enter name)\n" +
                 "m: find # of actors with lowest average separation either connected to center of universe\n" +
                 "o: find actors of specified # with most outDegree neighbors\n" +
