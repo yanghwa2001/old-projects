@@ -11,7 +11,7 @@ public class Sudi{
     public HashMap<String, HashMap<String, Double>> transitions;
     public String textFile;
     public String tagsFile;
-    public double unseen = -10000.0; //number subtracted when unseen
+    public double unseen = -10000.0; //number subtracted when unseen (bias)
 
     public Sudi(String textFile, String tagsFile) {
         try {
@@ -24,9 +24,9 @@ public class Sudi{
     }
 
     /**
-     * 
+     * Observations Training Method
      * Reads two files consisting of sentences and its corresponding pos tags to count frequencies of each words
-     * observed as specific pos tags. Creates a hashmap with the pos tag as the key and another hashmap with <word, frequency> as its value.
+     * observed as specific pos tags. Creates a hashmap (observations) with the pos tag as the key and another hashmap with <word, frequency> as its value.
      * 
      * @param sentenceFile
      * @param tagsFile
@@ -101,7 +101,9 @@ public class Sudi{
 
 
     /**
-     * Transition training method
+     * Transition Training Method
+     * Reads through the training file consisting of tags and builds the hashmap where each key(part of speech tag) corresponds to 
+     * a hashmap consisting of the ensuing tag and its frequency 
      * @throws IOException
      */
     public void transitionsTraining(String tagsFile) throws IOException {
@@ -115,8 +117,8 @@ public class Sudi{
             while (tagLine != null) {
                 String[] allLines = tagLine.split(" ");
                 for (int i = 0; i < allLines.length; i++) {
+                    //start with # 
                     if (i == 0){
-                        //start with #
                         if (transitions.containsKey("#")) {
                             HashMap<String, Double> currentState = transitions.get("#");
                             if (currentState.containsKey(allLines[0])) {
@@ -133,16 +135,17 @@ public class Sudi{
                             transitions.get("#").put(allLines[0], 1.0);
                         }
                     }
+                    //Otherwise, move onto the next word
                     String next = allLines[i + 1];
+                    //If there is a key for this word
                     if (transitions.containsKey(allLines[i])) {
-                        // currentState: inner map
                         HashMap<String, Double> currentState = transitions.get(allLines[i]);
-                        //if inner map has the next part of speech, add it
+                        //if inner map has the next part of speech, increment by 1
                         if (currentState.containsKey(next)) {
                             currentState.put(next, currentState.get(next) + 1);
                             transitions.put(allLines[i], currentState);
                         }
-                        // if it doesn't have that, just add to inner map
+                        // if it doesn't have that, just add a new one to inner map
                         else {
                             currentState.put(next, 1.0);
                             transitions.put(allLines[i], currentState);
@@ -180,11 +183,20 @@ public class Sudi{
         }
     }
 
+    /**
+     * Viterbi
+     * 
+     * Implementation of the viterbi algorithm
+     * Uses hashmaps from observations and transitions training to predict the most likely sequence of hidden states given a sentence (string)
+     * Input: String consisting of words and spaces
+     * Returns: The POS tag for each word
+     * 
+     */
     public String viterbi(String lineInput) {
         // default start value
-        String currentStates = "#";
+        String currentState = "#";
         Map<String, Double> currScores = new HashMap<>();
-        currScores.put(currentStates, 0.0);
+        currScores.put(currentState, 0.0);
 
         //initialize: blank line at first
         String lineOut = "";
@@ -195,20 +207,18 @@ public class Sudi{
         List<Map<String, String>> backtrack = new ArrayList<>();
         Stack<String> printStrings = new Stack<>();
 
-        // loop through words
+        // loop through words from input
         String[] textArray = lineInput.split(" ");
         for (int k = 0; k < textArray.length; k++) {
-            Set<String> nextStates = new HashSet<>();
             Map<String, Double> nextScores = new HashMap<>();
             double nextScore;
 
-            //loop previous stages
+            //loop current stages
             for (String current : currScores.keySet()) {
-
-                //check state during transitions
+                //check that this current state exists in the transitions hashmap and that it has a corresponding transition + value
                 if (transitions.containsKey(current) && !transitions.get(current).isEmpty()) {
+                    //loop through all the next possible states
                     for (String next : transitions.get(current).keySet()) {
-                        nextStates.add(next);
                         //change the score, with a penalty if it's not in observations
                         if (observations.containsKey(next) && observations.get(next).containsKey(textArray[k])) {
                             nextScore = currScores.get(current) + transitions.get(current).get(next) + observations.get(next).get(textArray[k]);
@@ -216,8 +226,11 @@ public class Sudi{
                         else {
                             nextScore = currScores.get(current) + transitions.get(current).get(next) + unseen;
                         }
+
+                        //Update the next word and the corresponding score to nextscores, update score for the word if higher score
                         if (!nextScores.containsKey(next) || nextScore > nextScores.get(next)) {
                             nextScores.put(next, nextScore);
+                            //Also update backtrack
                             if (backtrack.size() <= k) {
                                 backtrack.add(new HashMap<>());
                             }
@@ -230,7 +243,7 @@ public class Sudi{
             currScores = nextScores;
         }
 
-        // go through previous scores to find one with the highest score
+        // go through the final scores to find one with the highest score
         for (String current : currScores.keySet()) {
             if (currScores.get(current) > highScore) {
                 highScore = currScores.get(current);
